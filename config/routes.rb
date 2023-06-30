@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   root 'test#index'
 
   scope '/api' do
-    resources :posts
+    get '/posts/random', to: 'posts#random'
+    resources :posts, only: %i[index show]
   end
 end
