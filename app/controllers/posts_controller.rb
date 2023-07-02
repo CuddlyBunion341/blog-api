@@ -21,6 +21,30 @@ class PostsController < ApplicationController
   # GET /posts/random (get a random post)
   def random
     @post = Post.order('RANDOM()').first
-    render json: @post
+
+    if @post.nil?
+      render json: { error: 'No posts present' }, status: :not_found
+    else
+      render json: @post
+    end
+  end
+
+  # POST /posts (create a new post)
+  def create
+    @post = Post.new(post_params)
+    @post.user = User.first
+
+    if @post.save
+      render json: @post, status: :created, location: post_url(@post)
+    else
+      render json: { error: @post.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  # Only allow a trusted parameter "white list" through.
+  def post_params
+    params.require(:post).permit(:title, :content)
   end
 end

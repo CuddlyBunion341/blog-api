@@ -55,4 +55,27 @@ RSpec.describe 'Posts', type: :request do
       end
     end
   end
+
+  describe 'POST /create' do
+    let(:path) { '/api/posts' }
+    let(:params) { { post: { title: 'Hello', content: 'World' } } }
+
+    it 'returns a 201' do
+      post path, params: params
+      expect(response).to have_http_status(201)
+    end
+
+    it 'creates a new post' do
+      expect { post path, params: params }.to change(Post, :count).by(1)
+    end
+
+    context 'when the post is invalid' do
+      let(:params) { { post: { title: 'Hello' } } }
+
+      it 'returns a 420' do
+        post path, params: params
+        expect(response).to have_http_status(420)
+      end
+    end
+  end
 end
