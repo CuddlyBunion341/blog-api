@@ -2,6 +2,9 @@ class PostsController < ApplicationController
   # GET /posts (list all posts)
   def index
     @posts = Post.all
+
+    @posts = @posts.includes(:user) if params[:expand] == 'user'
+
     render json: @posts
   end
 
