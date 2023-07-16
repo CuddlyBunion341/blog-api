@@ -15,6 +15,10 @@ class UsersController < ApplicationController
       return
     end
 
-    render json: @user
+    if params[:expand] == 'posts'
+      render json: @user, include: :posts
+    else
+      render json: @user
+    end
   end
 end
