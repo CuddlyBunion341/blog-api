@@ -6,9 +6,11 @@ Rails.application.routes.draw do
   root 'test#index'
 
   scope '/api' do
-    get '/posts/random', to: 'posts#random'
-    resources :posts, only: %i[index show create]
+    scope '/v1' do
+      get '/posts/random', to: 'posts#random'
+      resources :posts, only: %i[index show create]
 
-    resources :users, only: %i[index show]
+      resources :users, only: %i[index show]
+    end
   end
 end
