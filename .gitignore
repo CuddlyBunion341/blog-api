@@ -37,3 +37,6 @@
 
 # Ignore MacOs files
 .DS_Store
+
+# Ignore doc directory (temporarily)
+/doc/*
