@@ -1,4 +1,9 @@
 FactoryBot.define do
+  factory :tag do
+    name { 'MyString' }
+    description { 'MyString' }
+  end
+
   factory :comment do
     author { FactoryBot.create(:user) }
     body { 'MyText' }
