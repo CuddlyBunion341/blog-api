@@ -2,10 +2,7 @@ class PostsController < ApplicationController
   # GET /posts (list all posts)
   def index
     @posts = Post.all
-
-    @posts = @posts.includes(:user) if params[:expand] == 'user'
-
-    render json: @posts
+    render json: @posts, each_serializer: PostSerializer
   end
 
   # GET /posts/:id (get a specific post)
@@ -18,7 +15,7 @@ class PostsController < ApplicationController
       return
     end
 
-    render json: @post
+    render json: @post, serializer: PostSerializer
   end
 
   # GET /posts/random (get a random post)
@@ -35,7 +32,7 @@ class PostsController < ApplicationController
   # POST /posts (create a new post)
   def create
     @post = Post.new(post_params)
-    @post.user = User.first
+    @post.author = User.first
 
     if @post.save
       render json: @post, status: :created, location: post_url(@post)

@@ -160,6 +160,8 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    rdbg (0.1.0)
+      debug (>= 1.2.2)
     reline (0.3.5)
       io-console (~> 0.5)
     rspec-core (3.12.2)
@@ -209,6 +211,7 @@ DEPENDENCIES
   puma (~> 5.0)
   rack-cors
   rails (~> 7.0.4, >= 7.0.4.3)
+  rdbg
   rspec-rails (~> 5.0.0)
   shoulda-matchers
   simplecov
