@@ -1,15 +1,32 @@
 class CommentsSerializer < ActiveModel::Serializer
   attributes :id
 
+  OPTIONAL_ATTRIBUTES = {
+    include_author: true,
+    include_created_at: true,
+    include_updated_at: true,
+    include_body: true
+  }.freeze
+
+  # TODO: extract the following block to a module
+  # BEGIN
   def initialize(object, options = {})
     super(object, options)
-    @include_author = options[:include_author].nil? ? true : options[:include_author]
-    @include_created_at = options[:include_created_at].nil? ? true : options[:include_created_at]
-    @include_updated_at = options[:include_updated_at].nil? ? true : options[:include_updated_at]
-    @include_body = options[:include_body].nil? ? true : options[:include_body]
-
-    puts options
+    @options = OPTIONAL_ATTRIBUTES.merge(options)
   end
+
+  def method_missing(method_name, *args, &block)
+    if @options.key?(method_name)
+      @options[method_name]
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    @options.key?(method_name) || super
+  end
+  # END
 
   def author
     user_options = {
@@ -20,22 +37,6 @@ class CommentsSerializer < ActiveModel::Serializer
     }
 
     UserSerializer.new(object.author, user_options)
-  end
-
-  def include_body?
-    @include_body
-  end
-
-  def include_author?
-    @include_author
-  end
-
-  def include_created_at?
-    @include_created_at
-  end
-
-  def include_updated_at?
-    @include_updated_at
   end
 
   attribute :body, if: :include_body?

@@ -1,13 +1,32 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :username
 
+  OPTIONAL_ATTRIBUTES = {
+    include_posts: true,
+    include_email: true,
+    include_created_at: true,
+    include_updated_at: true
+  }.freeze
+
+  # TODO: extract the following block to a module
+  # BEGIN
   def initialize(object, options = {})
     super(object, options)
-    @include_posts = options[:include_posts].nil? ? false : options[:include_posts]
-    @include_email = options[:include_email].nil? ? false : options[:include_email]
-    @include_created_at = options[:include_created_at].nil? ? true : options[:include_created_at]
-    @include_updated_at = options[:include_updated_at].nil? ? true : options[:include_updated_at]
+    @options = OPTIONAL_ATTRIBUTES.merge(options)
   end
+
+  def method_missing(method_name, *args, &block)
+    if @options.key?(method_name)
+      @options[method_name]
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    @options.key?(method_name) || super
+  end
+  # END
 
   def posts
     post_options = {
@@ -21,22 +40,6 @@ class UserSerializer < ActiveModel::Serializer
     object.posts.map do |post|
       PostSerializer.new(post, post_options)
     end
-  end
-
-  def include_email?
-    @include_email
-  end
-
-  def include_created_at?
-    @include_created_at
-  end
-
-  def include_updated_at?
-    @include_updated_at
-  end
-
-  def include_posts?
-    @include_posts
   end
 
   attribute :email, if: :include_email?
