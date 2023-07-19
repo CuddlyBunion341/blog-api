@@ -1,34 +1,17 @@
-class PostSerializer < ActiveModel::Serializer
+class PostSerializer < AdaptiveSerializer
   attributes :id, :title, :created_at, :updated_at
 
   OPTIONAL_ATTRIBUTES = {
     include_author: true,
-    include_body: true,
+    include_body: false,
     include_comments: true,
     include_comments_author: true,
     include_comments_body: true
   }.freeze
 
-  # TODO: extract the following block to a module
-  # BEGIN
   def initialize(object, options = {})
-    super(object, options)
-    @options = OPTIONAL_ATTRIBUTES.merge(options)
+    super(object, OPTIONAL_ATTRIBUTES.merge(options))
   end
-
-  def method_missing(method_name, *args, &block)
-    puts "method_name: #{method_name}"
-    if @options.key?(method_name)
-      @options[method_name]
-    else
-      super
-    end
-  end
-
-  def respond_to_missing?(method_name, include_private = false)
-    @options.key?(method_name) || super
-  end
-  # END
 
   def author
     user_options = {

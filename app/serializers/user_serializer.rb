@@ -1,4 +1,4 @@
-class UserSerializer < ActiveModel::Serializer
+class UserSerializer < AdaptiveSerializer
   attributes :id, :username
 
   OPTIONAL_ATTRIBUTES = {
@@ -8,25 +8,9 @@ class UserSerializer < ActiveModel::Serializer
     include_updated_at: true
   }.freeze
 
-  # TODO: extract the following block to a module
-  # BEGIN
   def initialize(object, options = {})
-    super(object, options)
-    @options = OPTIONAL_ATTRIBUTES.merge(options)
+    super(object, OPTIONAL_ATTRIBUTES.merge(options))
   end
-
-  def method_missing(method_name, *args, &block)
-    if @options.key?(method_name)
-      @options[method_name]
-    else
-      super
-    end
-  end
-
-  def respond_to_missing?(method_name, include_private = false)
-    @options.key?(method_name) || super
-  end
-  # END
 
   def posts
     post_options = {
