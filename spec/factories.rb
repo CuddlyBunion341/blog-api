@@ -17,8 +17,8 @@ FactoryBot.define do
   end
 
   factory :post do
-    title { 'Hello World!' }
-    content { 'Lorem Ipsum...' }
-    user { FactoryBot.create(:user) }
+    sequence(:title) { |n| "Post #{n}" }
+    body { 'Lorem Ipsum...' }
+    author { FactoryBot.create(:user) }
   end
 end
