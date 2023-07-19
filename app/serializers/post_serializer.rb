@@ -3,7 +3,7 @@ class PostSerializer < AdaptiveSerializer
 
   OPTIONAL_ATTRIBUTES = {
     include_author: true,
-    include_body: false,
+    include_body: true,
     include_comments: true,
     include_comments_author: true,
     include_comments_body: true
@@ -16,9 +16,9 @@ class PostSerializer < AdaptiveSerializer
   def author
     user_options = {
       include_posts: false,
-      include_email: true,
-      include_created_at: true,
-      include_updated_at: true
+      include_email: false,
+      include_created_at: false,
+      include_updated_at: false
     }
 
     UserSerializer.new(object.author, user_options)
@@ -26,8 +26,8 @@ class PostSerializer < AdaptiveSerializer
 
   def comments
     comment_options = {
-      include_author: @include_comments_author,
-      include_body: @include_comments_body
+      include_author: include_comments_author?,
+      include_body: include_comments_body?
     }
 
     object.comments.map do |comment|
