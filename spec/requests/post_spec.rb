@@ -69,7 +69,7 @@ RSpec.describe 'Posts', type: :request do
 
   describe 'POST /create' do
     let(:path) { '/api/v1/posts' }
-    let!(:params) { { post: { title: 'Hello', content: 'World', user: FactoryBot.create(:user) } } }
+    let!(:params) { { post: { title: 'Hello', body: 'World', user: FactoryBot.create(:user) } } }
 
     it 'returns a 201' do
       post path, params: params

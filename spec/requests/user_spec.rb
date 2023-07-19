@@ -4,6 +4,7 @@ RSpec.describe 'Users', type: :request do
   describe 'GET /index' do
     let(:path) { '/api/v1/users' }
     let!(:users) { FactoryBot.create_list(:user, 10) }
+    let!(:posts) { FactoryBot.create_list(:post, 10, author: users.first) }
 
     before { get path }
 
@@ -36,8 +37,7 @@ RSpec.describe 'Users', type: :request do
     it 'returns a list of posts for the user' do
       get "#{path}?expand=posts"
 
-      # TODO: test that the response body is the list of posts
-
+      expect(response.body).to include('posts')
       expect(response).to have_http_status(200)
     end
   end
