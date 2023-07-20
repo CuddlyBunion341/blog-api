@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   scope '/api' do
     scope '/v1' do
       get '/posts/random', to: 'posts#random'
-      resources :posts, only: %i[index show create]
+      resources :posts, only: %i[index show create update]
 
       resources :users, only: %i[index show]
       devise_for :users, controllers: {

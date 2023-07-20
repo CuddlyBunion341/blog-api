@@ -71,36 +71,84 @@ RSpec.describe 'Posts', type: :request do
     let(:path) { '/api/v1/posts' }
     let!(:params) { { post: { title: 'Hello', body: 'World' } } }
 
-    before(:each) do
-      login_as(FactoryBot.create(:user, admin: true))
-    end
-
     context 'when user is not logged in' do
-      before(:each) do
-        logout
-      end
-
       it 'returns a 401' do
         post path, params: params
         expect(response).to have_http_status(401)
       end
     end
 
-    it 'returns a 201' do
-      post path, params: params
-      expect(response).to have_http_status(201)
+    context 'when user is not admin' do
+      it 'returns a 401' do
+        login_as(FactoryBot.create(:user, admin: false))
+        post path, params: params
+        expect(response).to have_http_status(401)
+      end
     end
 
-    it 'creates a new post' do
-      expect { post path, params: params }.to change(Post, :count).by(1)
+    context 'when the post is valid' do
+      before(:each) do
+        login_as(FactoryBot.create(:user, admin: true))
+        post path, params: params
+      end
+
+      it 'returns a 201' do
+        expect(response).to have_http_status(201)
+      end
+
+      it 'creates a new post' do
+        expect(Post.count).to eq(1)
+      end
     end
 
     context 'when the post is invalid' do
       let(:params) { { post: { title: 'Hello' } } }
 
       it 'returns a 422' do
+        login_as(FactoryBot.create(:user, admin: true))
         post path, params: params
         expect(response).to have_http_status(422)
+      end
+    end
+  end
+
+  describe 'PUT /update' do
+    let(:path) { '/api/v1/posts' }
+    let!(:post) do
+      post = FactoryBot.create(:post)
+      post.author = FactoryBot.create(:user, admin: true)
+      post
+    end
+
+    let(:params) { { post: { title: 'Hello', body: 'World' } } }
+
+    context 'when user is authorized to update the post' do
+      before(:each) do
+        login_as(post.author)
+        put "#{path}/#{post.id}", params: params
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'updates the post' do
+        expect(post.reload.title).to eq('Hello')
+      end
+    end
+
+    context 'when user is not authorized to update the post' do
+      before(:each) do
+        login_as(FactoryBot.create(:user, admin: false))
+        put "#{path}/#{post.id}", params: params
+      end
+
+      it 'returns a 401' do
+        expect(response).to have_http_status(401)
+      end
+
+      it 'does not update the post' do
+        expect(post.reload.title).to_not eq('Hello')
       end
     end
   end

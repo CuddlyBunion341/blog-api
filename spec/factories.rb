@@ -5,13 +5,13 @@ FactoryBot.define do
   end
 
   factory :comment do
-    author { FactoryBot.create(:user) }
+    association :author, factory: :user
     body { 'MyText' }
-    post { FactoryBot.create(:post) }
+    association :post
   end
 
   factory :user do
-    username { 'test' }
+    sequence(:username) { |n| "user#{n}" }
     password { '123456' }
     sequence(:email) { |n| "user#{n}@example.com" }
   end
@@ -19,6 +19,6 @@ FactoryBot.define do
   factory :post do
     sequence(:title) { |n| "Post #{n}" }
     body { 'Lorem Ipsum...' }
-    author { FactoryBot.create(:user) }
+    association :author, factory: :user
   end
 end

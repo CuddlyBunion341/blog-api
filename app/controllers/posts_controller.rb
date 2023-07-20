@@ -48,6 +48,32 @@ class PostsController < ApplicationController
     end
   end
 
+  # PUT /posts/:id (update a post)
+  def update
+    unless current_user.admin?
+      render json: { error: 'You are not authorized to update a post' }, status: :unauthorized
+      return
+    end
+
+    begin
+      @post = Post.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: e.message }, status: :not_found
+      return
+    end
+
+    unless current_user == @post.author
+      render json: { error: 'You are not authorized to update this post' }, status: :unauthorized
+      return
+    end
+
+    if @post.update(post_params)
+      render json: @post, status: :ok
+    else
+      render json: { error: @post.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   # Only allow a trusted parameter "white list" through.
