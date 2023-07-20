@@ -69,7 +69,22 @@ RSpec.describe 'Posts', type: :request do
 
   describe 'POST /create' do
     let(:path) { '/api/v1/posts' }
-    let!(:params) { { post: { title: 'Hello', body: 'World', user: FactoryBot.create(:user) } } }
+    let!(:params) { { post: { title: 'Hello', body: 'World' } } }
+
+    before(:each) do
+      login_as(FactoryBot.create(:user, admin: true))
+    end
+
+    context 'when user is not logged in' do
+      before(:each) do
+        logout
+      end
+
+      it 'returns a 401' do
+        post path, params: params
+        expect(response).to have_http_status(401)
+      end
+    end
 
     it 'returns a 201' do
       post path, params: params

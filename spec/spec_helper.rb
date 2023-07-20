@@ -1,3 +1,6 @@
+# Devise authentication
+require 'devise'
+
 # Code coverage
 require 'simplecov'
 SimpleCov.start
@@ -94,4 +97,7 @@ RSpec.configure do |config|
   #   # test failures related to randomization by passing the same `--seed` value
   #   # as the one that triggered the failure.
   #   Kernel.srand config.seed
+
+  config.include Devise::TestHelpers, type: :controller
+  config.include Warden::Test::Helpers
 end

@@ -15,6 +15,9 @@ gem 'puma', '~> 5.0'
 # Use Serializer for JSON serialization
 gem 'active_model_serializers'
 
+# Use Devise for authentication
+gem 'devise'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

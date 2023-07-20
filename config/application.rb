@@ -24,6 +24,9 @@ module BlogApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore, key: '_cookie_name'
+
     # Use RSpec for testing
     config.generators.test_framework = :rspec
   end
