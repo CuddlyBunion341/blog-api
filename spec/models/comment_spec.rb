@@ -12,6 +12,7 @@ RSpec.describe Comment, type: :model do
 
   describe 'factory' do
     it 'should have valid factory' do
+      User.delete_all # need to delete all users to avoid duplicate emails error
       expect(FactoryBot.create(:comment)).to be_valid
     end
   end

@@ -114,15 +114,17 @@ RSpec.describe 'Posts', type: :request do
 
   describe 'PUT /update' do
     let(:path) { '/api/v1/posts' }
-    let!(:post) do
-      post = FactoryBot.create(:post)
-      post.author = FactoryBot.create(:user, admin: true)
-      post
-    end
+    let!(:author) { FactoryBot.create(:user, admin: true) }
+    let!(:post) { FactoryBot.create(:post, author: author) }
+    #   post = FactoryBot.create(:post)
+    #   post.author = FactoryBot.create(:user, admin: true)
+    #   post
+    # end
 
     let(:params) { { post: { title: 'Hello', body: 'World' } } }
+    let(:bad_params) { { post: { title: '' } } }
 
-    context 'when user is authorized to update the post' do
+    context 'when post is valid' do
       before(:each) do
         login_as(post.author)
         put "#{path}/#{post.id}", params: params
@@ -134,6 +136,21 @@ RSpec.describe 'Posts', type: :request do
 
       it 'updates the post' do
         expect(post.reload.title).to eq('Hello')
+      end
+    end
+
+    context 'when post is invalid' do
+      before(:each) do
+        login_as(post.author)
+        put "#{path}/#{post.id}", params: bad_params
+      end
+
+      it 'returns a 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'does not update the post' do
+        expect{ post.reload.title }.not_to change(post, :title)
       end
     end
 
@@ -149,6 +166,17 @@ RSpec.describe 'Posts', type: :request do
 
       it 'does not update the post' do
         expect(post.reload.title).to_not eq('Hello')
+      end
+    end
+
+    context 'when post does not exist' do
+      before(:each) do
+        login_as(author)
+        put "#{path}/0", params: params
+      end
+
+      it 'returns a 404' do
+        expect(response).to have_http_status(404)
       end
     end
   end

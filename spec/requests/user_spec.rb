@@ -41,4 +41,32 @@ RSpec.describe 'Users', type: :request do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe 'GET /current' do
+    let(:path) { '/api/v1/users/current'}
+    let!(:user) { FactoryBot.create(:user) }
+
+    context 'when the user is not logged in' do
+      before(:each) { get path }
+
+      it 'returns a 401' do
+        expect(response).to have_http_status(401)
+      end
+    end
+
+    context 'when the user is logged in' do
+      before(:each) do
+        login_as(user)
+        get path
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the user object' do
+        expect(response.body).to include('user')
+      end
+    end
+  end
 end

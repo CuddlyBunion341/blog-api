@@ -21,4 +21,15 @@ class UsersController < ApplicationController
       render json: @user
     end
   end
+
+  # GET /users/current (get the current user)
+  def current
+    @user = current_user
+    if @user
+      user_options = { include_posts: false }
+      render json: @user, serializer: UserSerializer
+    else
+      render json: { error: 'Not logged in' }, status: :unauthorized
+    end
+  end
 end

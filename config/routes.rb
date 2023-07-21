@@ -10,11 +10,12 @@ Rails.application.routes.draw do
       get '/posts/random', to: 'posts#random'
       resources :posts, only: %i[index show create update]
 
+      get '/users/current', to: 'users#current'
       resources :users, only: %i[index show]
       devise_for :users, controllers: {
-        session: 'users/sessions',
-        registration: 'users/registrations'
-      }
+        # session: 'users/sessions',
+        # registration: 'users/registrations'
+      }, defaults: { format: :json }
     end
   end
 end

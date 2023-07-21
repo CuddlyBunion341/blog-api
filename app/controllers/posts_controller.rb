@@ -50,11 +50,6 @@ class PostsController < ApplicationController
 
   # PUT /posts/:id (update a post)
   def update
-    unless current_user.admin?
-      render json: { error: 'You are not authorized to update a post' }, status: :unauthorized
-      return
-    end
-
     begin
       @post = Post.find(params[:id])
     rescue ActiveRecord::RecordNotFound => e
