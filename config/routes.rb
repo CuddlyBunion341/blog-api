@@ -12,10 +12,11 @@ Rails.application.routes.draw do
 
       get '/users/current', to: 'users#current'
       resources :users, only: %i[index show]
-      devise_for :users, controllers: {
-        # session: 'users/sessions',
-        # registration: 'users/registrations'
-      }, defaults: { format: :json }
+
+      post '/login', to: 'users/sessions#login'
+      post '/logout', to: 'users/sessions#logout'
+      post '/signup', to: 'users/registrations#signup'
+      get '/user', to: 'users/sessions#user'
     end
   end
 end
