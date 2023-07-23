@@ -1,6 +1,4 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, only: [:create]
-
   # GET /posts (list all posts)
   def index
     @posts = Post.all
