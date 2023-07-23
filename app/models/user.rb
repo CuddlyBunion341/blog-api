@@ -3,8 +3,7 @@ class User < ApplicationRecord
   validates :email, presence: true
 
   has_many :posts, foreign_key: :author_id, dependent: :destroy
-
-  devise :database_authenticatable, :registerable, :validatable, :rememberable
+  has_many :comments, foreign_key: :author_id, dependent: :destroy
 
   validates_confirmation_of :password
 end

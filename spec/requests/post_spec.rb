@@ -116,10 +116,6 @@ RSpec.describe 'Posts', type: :request do
     let(:path) { '/api/v1/posts' }
     let!(:author) { FactoryBot.create(:user, admin: true) }
     let!(:post) { FactoryBot.create(:post, author: author) }
-    #   post = FactoryBot.create(:post)
-    #   post.author = FactoryBot.create(:user, admin: true)
-    #   post
-    # end
 
     let(:params) { { post: { title: 'Hello', body: 'World' } } }
     let(:bad_params) { { post: { title: '' } } }
@@ -150,7 +146,7 @@ RSpec.describe 'Posts', type: :request do
       end
 
       it 'does not update the post' do
-        expect{ post.reload.title }.not_to change(post, :title)
+        expect { post.reload.title }.not_to change(post, :title)
       end
     end
 
