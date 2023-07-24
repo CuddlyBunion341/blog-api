@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Users::Sessions', type: :request do
   include AuthHelper
-  
+
   describe 'GET /user' do
     let(:path) { '/api/v1/user' }
     let!(:user) { FactoryBot.create(:user) }
@@ -39,7 +39,7 @@ RSpec.describe 'Users::Sessions', type: :request do
       end
 
       it 'returns the user' do
-        expect(JSON.parse(response.body)['user']['id']).to eq(user.id)
+        expect(JSON.parse(response.body)['id']).to eq(user.id)
       end
     end
 
