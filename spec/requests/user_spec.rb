@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Users', type: :request do
+  include AuthHelper
+
   describe 'GET /index' do
     let(:path) { '/api/v1/users' }
     let!(:users) { FactoryBot.create_list(:user, 10) }
@@ -43,7 +45,7 @@ RSpec.describe 'Users', type: :request do
   end
 
   describe 'GET /current' do
-    let(:path) { '/api/v1/users/current'}
+    let(:path) { '/api/v1/users/current' }
     let!(:user) { FactoryBot.create(:user) }
 
     context 'when the user is not logged in' do

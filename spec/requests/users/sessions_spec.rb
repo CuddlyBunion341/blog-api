@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Users::Sessions', type: :request do
+  include AuthHelper
+  
   describe 'GET /user' do
     let(:path) { '/api/v1/user' }
     let!(:user) { FactoryBot.create(:user) }
@@ -14,7 +16,7 @@ RSpec.describe 'Users::Sessions', type: :request do
 
     context 'when user is logged in' do
       it 'returns 200' do
-        sign_in_as(user)
+        login_as(user)
         get path
         expect(response).to have_http_status(200)
       end
@@ -69,7 +71,7 @@ RSpec.describe 'Users::Sessions', type: :request do
 
     context 'when user is logged in' do
       it 'returns 200' do
-        sign_in_as(user)
+        login_as(user)
         delete path
         expect(response).to have_http_status(200)
       end

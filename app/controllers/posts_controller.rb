@@ -31,7 +31,7 @@ class PostsController < ApplicationController
 
   # POST /posts (create a new post)
   def create
-    unless current_user.admin?
+    unless current_user&.admin?
       render json: { error: 'You are not authorized to create a post' }, status: :unauthorized
       return
     end

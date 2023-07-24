@@ -14,8 +14,8 @@ Rails.application.routes.draw do
       resources :users, only: %i[index show]
 
       post '/login', to: 'users/sessions#login'
-      post '/logout', to: 'users/sessions#logout'
-      post '/signup', to: 'users/registrations#signup'
+      delete '/logout', to: 'users/sessions#logout'
+      post '/signup', to: 'users/registrations#create'
       get '/user', to: 'users/sessions#user'
     end
   end

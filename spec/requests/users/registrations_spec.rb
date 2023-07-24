@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe 'Users::Registrations', type: :request do
   describe 'POST /create' do
     let(:path) { '/api/v1/signup' }
-    let(:params) { { username: 'testUser', email: 'test@example.com', password: 'password' } }
+    let(:params) { { user: { username: 'testUser', email: 'test@example.com', password: 'password' } } }
+    let(:bad_params) { { user: {} } }
 
     context 'when params are valid' do
       before(:each) do
@@ -21,7 +22,7 @@ RSpec.describe 'Users::Registrations', type: :request do
 
     context 'when params are invalid' do
       before(:each) do
-        post path, params: params.except(:username)
+        post path, params: bad_params
       end
 
       it 'returns a 422' do
