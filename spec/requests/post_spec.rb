@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Posts', type: :request do
+  include AuthHelper
+
   describe 'GET /index' do
     let(:path) { '/api/v1/posts' }
     let!(:posts) { FactoryBot.create_list(:post, 10) }
@@ -14,10 +16,10 @@ RSpec.describe 'Posts', type: :request do
   end
 
   describe 'GET /show' do
-    let(:post_id) { post.id }
+    let!(:blog_post) { FactoryBot.create(:post) }
+    let(:post_id) { blog_post.id }
     let(:path) { "/api/v1/posts/#{post_id}" }
-    let!(:post) { FactoryBot.create(:post) }
-    let!(:comments) { FactoryBot.create_list(:comment, 8, post: post) }
+    let!(:comments) { FactoryBot.create_list(:comment, 8, post: blog_post) }
 
     before { get path }
 
@@ -47,7 +49,7 @@ RSpec.describe 'Posts', type: :request do
 
   describe 'GET /random' do
     let(:path) { '/api/v1/posts/random' }
-    let!(:post) { FactoryBot.create(:post) }
+    let!(:blog_post) { FactoryBot.create(:post) }
 
     before { get path }
 
@@ -59,7 +61,7 @@ RSpec.describe 'Posts', type: :request do
     context 'when there are no posts' do
       # TODO: fix this test
 
-      let!(:post) { nil }
+      let!(:blog_post) { nil }
 
       it 'returns a 404' do
         expect(response).to have_http_status(404)
@@ -115,15 +117,15 @@ RSpec.describe 'Posts', type: :request do
   describe 'PUT /update' do
     let(:path) { '/api/v1/posts' }
     let!(:author) { FactoryBot.create(:user, admin: true) }
-    let!(:post) { FactoryBot.create(:post, author: author) }
+    let!(:blog_post) { FactoryBot.create(:post, author: author) }
 
     let(:params) { { post: { title: 'Hello', body: 'World' } } }
     let(:bad_params) { { post: { title: '' } } }
 
     context 'when post is valid' do
       before(:each) do
-        login_as(post.author)
-        put "#{path}/#{post.id}", params: params
+        login_as(blog_post.author)
+        put "#{path}/#{blog_post.id}", params: params
       end
 
       it 'returns a 200' do
@@ -131,14 +133,14 @@ RSpec.describe 'Posts', type: :request do
       end
 
       it 'updates the post' do
-        expect(post.reload.title).to eq('Hello')
+        expect(blog_post.reload.title).to eq('Hello')
       end
     end
 
     context 'when post is invalid' do
       before(:each) do
-        login_as(post.author)
-        put "#{path}/#{post.id}", params: bad_params
+        login_as(blog_post.author)
+        put "#{path}/#{blog_post.id}", params: bad_params
       end
 
       it 'returns a 422' do
@@ -146,14 +148,14 @@ RSpec.describe 'Posts', type: :request do
       end
 
       it 'does not update the post' do
-        expect { post.reload.title }.not_to change(post, :title)
+        expect { blog_post.reload.title }.not_to change(blog_post, :title)
       end
     end
 
     context 'when user is not authorized to update the post' do
       before(:each) do
         login_as(FactoryBot.create(:user, admin: false))
-        put "#{path}/#{post.id}", params: params
+        put "#{path}/#{blog_post.id}", params: params
       end
 
       it 'returns a 401' do
@@ -161,7 +163,7 @@ RSpec.describe 'Posts', type: :request do
       end
 
       it 'does not update the post' do
-        expect(post.reload.title).to_not eq('Hello')
+        expect(blog_post.reload.title).to_not eq('Hello')
       end
     end
 

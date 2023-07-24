@@ -1,18 +1,7 @@
 class ApplicationController < ActionController::API
-  respond_to :json
+  def current_user
+    return nil unless session[:user_id]
 
-  protected
-
-  def authenticate_user!
-    return if user_signed_in?
-
-    render json: { error: 'Unauthorized' }, status: :unauthorized
-  end
-
-  before_action :configure_permitted_parameters, if: :devise_controller?
-
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username password_confirmation])
-    devise_parameter_sanitizer.permit(:account_update, keys: %i[username password_confirmation])
+    User.find_by(id: session[:user_id])
   end
 end
