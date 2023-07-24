@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       get '/users/current', to: 'users#current'
       resources :users, only: %i[index show]
 
+      resources :comments, only: %i[create update destroy]
+
       post '/login', to: 'users/sessions#login'
       delete '/logout', to: 'users/sessions#logout'
       post '/signup', to: 'users/registrations#create'

@@ -7,10 +7,13 @@ class CommentsController < ApplicationController
     end
 
     comment = Comment.new(post_params)
-    comment.user = current_user
-    comment.save
+    comment.author = current_user
 
-    render json: comment, serializer: CommentSerializer
+    if comment.save
+      render json: comment, serializer: CommentsSerializer
+    else
+      render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def post_params
