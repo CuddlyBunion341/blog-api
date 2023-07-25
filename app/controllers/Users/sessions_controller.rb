@@ -1,4 +1,6 @@
 class Users::SessionsController < ApplicationController
+  before_action :require_user_login, only: %i[logout user]
+
   # POST /login
   def login
     user = User.find_by(email: params[:email])
@@ -12,22 +14,20 @@ class Users::SessionsController < ApplicationController
 
   # DELETE /logout
   def logout
-    if current_user.nil?
-      render json: { error: 'Not logged in' }, status: :unauthorized
-      return
-    end
-
     session.delete(:user_id)
     render json: { message: 'Logged out' }, status: :ok
   end
 
   # GET /user
   def user
-    if current_user.nil?
-      render json: { error: 'Not logged in' }, status: :unauthorized
-      return
-    end
-
     render json: current_user, serializer: UserSerializer, status: :ok
+  end
+
+  private
+
+  def require_user_login
+    return unless current_user.nil?
+
+    render json: { error: 'Not logged in' }, status: :unauthorized
   end
 end

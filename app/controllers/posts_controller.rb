@@ -1,4 +1,7 @@
 class PostsController < ApplicationController
+  before_action :require_post, only: %i[show update destroy]
+  before_action :require_post_author, only: %i[update destroy]
+
   # GET /posts (list all posts)
   def index
     @posts = Post.all
@@ -7,14 +10,6 @@ class PostsController < ApplicationController
 
   # GET /posts/:id (get a specific post)
   def show
-    # TODO: refactor this to a before_action
-    begin
-      @post = Post.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: { error: e.message }, status: :not_found
-      return
-    end
-
     render json: @post, serializer: PostSerializer
   end
 
@@ -48,19 +43,6 @@ class PostsController < ApplicationController
 
   # PUT /posts/:id (update a post)
   def update
-    # TODO: refactor this to a before_action
-    begin
-      @post = Post.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: { error: e.message }, status: :not_found
-      return
-    end
-
-    unless current_user == @post.author
-      render json: { error: 'You are not authorized to update this post' }, status: :unauthorized
-      return
-    end
-
     if @post.update(post_params)
       render json: @post, status: :ok
     else
@@ -70,19 +52,6 @@ class PostsController < ApplicationController
 
   # DELETE /posts/:id (delete a post)
   def destroy
-    # TODO: refactor this to a before_action
-    begin
-      @post = Post.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: { error: e.message }, status: :not_found
-      return
-    end
-
-    unless current_user == @post.author
-      render json: { error: 'You are not authorized to delete this post' }, status: :unauthorized
-      return
-    end
-
     @post.destroy
 
     render json: { message: 'Post deleted' }, status: :ok
@@ -90,8 +59,20 @@ class PostsController < ApplicationController
 
   private
 
-  # Only allow a trusted parameter "white list" through.
   def post_params
     params.require(:post).permit(:title, :body)
+  end
+
+  def require_post
+    @post = Post.find(params[:id])
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
+  end
+
+  def require_post_author
+    return if current_user == @post.author
+
+    render json: { error: 'You are not authorized to update this post' }, status: :unauthorized
+    nil
   end
 end

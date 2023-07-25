@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :require_user, only: %i[show]
+
   # GET /users (list all users)
   def index
     @users = User.all
@@ -7,14 +9,6 @@ class UsersController < ApplicationController
 
   # GET /users/:id (get a specific user)
   def show
-    # TODO: refactor this to a before_action
-    begin
-      @user = User.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: { error: e.message }, status: :not_found
-      return
-    end
-
     if params[:expand] == 'posts'
       render json: @user, include: :posts
     else
@@ -26,10 +20,17 @@ class UsersController < ApplicationController
   def current
     @user = current_user
     if @user
-      user_options = { include_posts: false }
-      render json: @user, serializer: UserSerializer
+      render json: @user, serializer: UserSerializer, include_posts: false
     else
       render json: { error: 'Not logged in' }, status: :unauthorized
     end
+  end
+
+  private
+
+  def require_user
+    @user = User.find(params[:id])
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
   end
 end
