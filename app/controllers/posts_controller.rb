@@ -48,6 +48,7 @@ class PostsController < ApplicationController
 
   # PUT /posts/:id (update a post)
   def update
+    # TODO: refactor this to a before_action
     begin
       @post = Post.find(params[:id])
     rescue ActiveRecord::RecordNotFound => e
@@ -65,6 +66,26 @@ class PostsController < ApplicationController
     else
       render json: { error: @post.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  # DELETE /posts/:id (delete a post)
+  def destroy
+    # TODO: refactor this to a before_action
+    begin
+      @post = Post.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: e.message }, status: :not_found
+      return
+    end
+
+    unless current_user == @post.author
+      render json: { error: 'You are not authorized to delete this post' }, status: :unauthorized
+      return
+    end
+
+    @post.destroy
+
+    render json: { message: 'Post deleted' }, status: :ok
   end
 
   private

@@ -178,4 +178,56 @@ RSpec.describe 'Posts', type: :request do
       end
     end
   end
+
+  describe 'DELETE /destroy' do
+    let!(:author) { FactoryBot.create(:user) }
+    let!(:blog_post) { FactoryBot.create(:post, author: author) }
+    let(:root_path) { '/api/v1/posts' }
+    let(:path) { "#{root_path}/#{blog_post.id}" }
+
+    context 'when user is not logged in' do
+      it 'returns a 401' do
+        delete path
+        expect(response).to have_http_status(401)
+      end
+
+      it 'does not delete the post' do
+        expect { delete path }.not_to change(Post, :count)
+      end
+    end
+
+    context 'when user is not authorized to delete the post' do
+      it 'returns a 401' do
+        login_as(FactoryBot.create(:user, admin: false))
+        delete path
+        expect(response).to have_http_status(401)
+      end
+
+      it 'does not delete the post' do
+        login_as(FactoryBot.create(:user, admin: false))
+        expect { delete path }.not_to change(Post, :count)
+      end
+    end
+
+    context 'when user is logged in' do
+      it 'returns a 200' do
+        login_as(author)
+        delete path
+        expect(response).to have_http_status(200)
+      end
+
+      it 'deletes the post' do
+        login_as(author)
+        expect { delete path }.to change(Post, :count).by(-1)
+      end
+    end
+
+    context 'when post does not exist' do
+      it 'returns a 404' do
+        login_as(author)
+        delete "#{root_path}/0"
+        expect(response).to have_http_status(404)
+      end
+    end
+  end
 end

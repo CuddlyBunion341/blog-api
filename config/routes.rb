@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       get 'test', to: 'test#index'
 
       get '/posts/random', to: 'posts#random'
-      resources :posts, only: %i[index show create update]
+      resources :posts, only: %i[index show create update destroy]
 
       get '/users/current', to: 'users#current'
       resources :users, only: %i[index show]
